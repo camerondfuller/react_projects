@@ -1,47 +1,71 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-var Timer = React.createClass({
+var TweetBox = React.createClass({
 
-  getInitialState: function(){
-    return {
-      secondsElapsed: 0
-   };
-  },
-  resetTimers: function(){
-    clearInterval(this.interval);
-    this.setState({ secondsElapsed: 0 });
-    this.start();
+   getInitialState:function() {
+      return {
+         text:'',
+         photoAdded:false
+      }
+   },
+   handleChange: function(event) {
+      this.setState({text:event.target.value})
+   },
+   remainingChars: function() {
+      if(this.state.photoAdded) {
+         return (140 - 23 - this.state.text.length)
+      } else {
+         return (140 - this.state.text.length)
+      }
+   },
+   overflowAlert:function() {
+      if(this.remainingChars() <0) {
+         if (this.state.photoAdded){
+         var beforeOverflowText = this.state.text.substring(130 - 23, 140);
+         var overflowText = this.state.text.substring(140 - 23);
+      } else {
+         var beforeOverflowText = this.state.text.substring(130, 140);
+         var overflowText = this.state.text.substring(140);
+      }
+         return (
+            <div className="alert alert-warning">
+               <strong>Oops! Too many characters!&nbsp;{beforeOverflowText}:&nbsp;<span className="bg-danger">{overflowText}</span></strong>
+            </div>
+         )
+      } else {
 
-  },
-  tick: function(){
-    this.setState({secondsElapsed: this.state.secondsElapsed +1});
-  },
+      }
+   },
+   togglePhoto:function() {
+      this.setState({photoAdded:!this.state.photoAdded})
+   },
+   render:function() {
+      return (
+         <div className="well clearfix">
+            {this.overflowAlert()}
+            <textarea onChange={this.handleChange} className="form-control"></textarea><br/>
+            <span>{this.remainingChars()}</span>
+            <button className="btn btn-primary pull-right" disabled={this.state.text.length === 0 && !this.state.photoAdded}>Tweet</button>
+            <button className="btn btn-default pull-right" onClick={this.togglePhoto} >{this.state.photoAdded ? "Photo Added!" : "Add Photo"}</button>
 
-  start:function (){
-  this.interval = setInterval(this.tick, 1000);
-  },
-
-  componentDidMount: function(){
-    setTimeout(this.start, this.props.timeout);
-  },
-
-  render: function(){
-    return ( <p> {this.props.name} has { this.state.secondsElapsed }s elapsed <button onClick={this.resetTimers  }>RESET</button> </p>);
-  }
+         </div>
+      )
+   }
 
 });
 
-var Timers = React.createClass({
-
-    render: function(){
+var MultiTweet = React.createClass({
+   render:function() {
       return (
-        <div>
-          <Timer timeout={0}    name="Timer1" />
-          <Timer timeout={200} name="Timer2" />
-          <Timer timeout={300} name="Timer3" />
-          </div>
+         <div>
+            <TweetBox />
+            <TweetBox />
+            <TweetBox />
+         </div>
       )
-    }
- });
-ReactDOM.render(<Timers />, document.querySelector('.mount-node'))
+   }
+
+});
+
+ReactDOM.render(<MultiTweet />, document.querySelector('.tweet-box'));

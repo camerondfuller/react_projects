@@ -9,14 +9,14 @@ var TodoList = React.createClass({
       }
    },
 
-   toggleComplete: function(todoItem) {
-      var todos = this.state.todos.map(function(todo){
-         if(todoItem === todo) {
-            todo.complete = !todo.complete;
+   toggleComplete: function(theTodoFromTheInstance) {
+      var newTodoArray = this.state.todos.map(function(theTodoToModify){
+         if(theTodoFromTheInstance === theTodoToModify) {
+            theTodoToModify.complete = !theTodoToModify.complete;
          }
-         return todo;
+         return theTodoToModify;
       });
-      this.setState({todos:todos});
+      this.setState({todos: newTodoArray});
    },
    // to get the input value, specify a ref on the input and then call it with this.refs
    addTodo: function(event) {
@@ -30,8 +30,15 @@ var TodoList = React.createClass({
       }
    },
 
+   removeTodo: function (todoData) {
+      var newTodoArray = this.state.todos.filter(function(theTodoToRemove){
+         return todoData === theTodoToRemove ? false : true;
+      });
+      this.setState({todos:newTodoArray});
+   },
+
    renderTodos: function(todo, index){
-      return  (<Todo key={index} id={index} toggleComplete={this.toggleComplete} item={todo}/>);
+      return  (<Todo key={index} id={index} toggleComplete={this.toggleComplete} removeTodo={this.removeTodo} todoData={todo}/>);
    },
 
    render: function() {
@@ -41,7 +48,7 @@ var TodoList = React.createClass({
             <h1>Todo List!</h1>
             <div className="add-todo">
                <form name="addTodoForm" onSubmit={this.addTodo}>
-                  <input type="text" ref="addTodo"/>
+                  <input type="text" ref="addTodo"/><span>(Hit Enter)</span>
                </form>
             </div>
             <ul>
@@ -51,6 +58,9 @@ var TodoList = React.createClass({
             <div className="todo-admin">
                <div>
                   {number} {number > 1 || number === 0 ? "todos" : "todo"}
+               </div>
+               <div>
+                  <button></button>
                </div>
             </div>
          </div>
@@ -67,15 +77,19 @@ var Todo = React.createClass({
    },
 
    toggleComplete: function() {
-      this.props.toggleComplete(this.props.item);
+      this.props.toggleComplete(this.props.todoData);
+   },
+
+   tellParentToRemoveTodo: function() {
+      this.props.removeTodo(this.props.todoData);
    },
 
    render: function(value, index) {
       return (
-         <li> {this.props.item.title}
+         <li> {this.props.todoData.title}
             <input type="checkbox" id={this.props.id} checked={this.props.complete} onClick={this.toggleComplete}></input>
             <label htmlFor={this.props.id} id={this.props.key}></label>
-            <button><i className="fa fa-trash"></i></button>
+            <button onClick={this.tellParentToRemoveTodo}><i className="fa fa-trash"></i></button>
          </li>
       )
    }

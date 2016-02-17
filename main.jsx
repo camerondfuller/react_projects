@@ -5,19 +5,67 @@ var TodoList = React.createClass({
 
    getInitialState: function(){
       return{
-         todos:[]
+         todos:[
+            {
+               title: 'placeholder todo',
+               complete: false
+            }
+         ]
       }
+   },
+
+   toggleComplete: function(todoItem) {
+      var todos = this.state.todos.map(function(todo){
+         if(todoItem === todo) {
+            todo.complete = !todo.complete;
+         }
+         return todo;
+      });
+      this.setState({todos:todos});
+   },
+
+   renderTodos: function(todo, index){
+      return   <Todo key={index}
+                     id={index}
+                     toggleComplete={this.toggleComplete}
+                     item={todo}/>;
    },
 
    render: function() {
       return (
          <div className='todo-list'>
-            <p>Hello from React!</p>
+            <h1>Todo List!</h1>
+            <ul>
+               {this.state.todos.map(this.renderTodos)}
+               {/*the map method works just like the forEach and the $.each method; they loop over an array*/}
+            </ul>
          </div>
       )
    }
 });
 
+// ---------------------------------
+// ---------------------------------
+
+var Todo = React.createClass({
+   getInitialState: function() {
+      return {};
+   },
+
+   toggleComplete: function() {
+      this.props.toggleComplete(this.props.item);
+   },
+
+   render: function(value, index) {
+      return (
+         <li> {this.props.item.title}
+            <input type="checkbox" id={this.props.id} checked={this.props.complete} onClick={this.toggleComplete}></input>
+            <label htmlFor={this.props.id} id={this.props.key}></label>
+            <button><i className="fa fa-trash"></i></button>
+         </li>
+      )
+   }
+});
 
 
 

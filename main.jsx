@@ -12,7 +12,7 @@ var TodoList = React.createClass({
    toggleComplete: function(theTodoFromTheInstance) {
       var newTodoArray = this.state.todos.map(function(theTodoToModify){
          if(theTodoFromTheInstance === theTodoToModify) {
-            theTodoToModify.complete = !theTodoToModify.complete;
+            theTodoToModify.complete = !theTodoToModify.complete
          }
          return theTodoToModify;
       });
@@ -36,9 +36,21 @@ var TodoList = React.createClass({
       });
       this.setState({todos:newTodoArray});
    },
+   removeSelected: function () {
+      var newTodoArray = this.state.todos.filter(function(todoItem){
+         return todoItem.complete ? false : true;
+      });
+      this.setState({todos: newTodoArray});
+   },
 
    renderTodos: function(todo, index){
       return  (<Todo key={index} id={index} toggleComplete={this.toggleComplete} removeTodo={this.removeTodo} todoData={todo}/>);
+   },
+   hasCompleted: function () {
+      var completedTodosArray = this.state.todos.filter(function(todoItem) {
+         return todoItem.complete === true;
+      });
+      return completedTodosArray.length;
    },
 
    render: function() {
@@ -59,8 +71,9 @@ var TodoList = React.createClass({
                <div>
                   {number} {number > 1 || number === 0 ? "todos" : "todo"}
                </div>
-               <div>
-                  <button></button>
+               <div> {this.hasCompleted() ?
+                  <button className="removeSelected" onClick={this.removeSelected}>Clear Selected</button> : ""
+                  }
                </div>
             </div>
          </div>
@@ -86,8 +99,8 @@ var Todo = React.createClass({
 
    render: function(value, index) {
       return (
-         <li> {this.props.todoData.title}
-            <input type="checkbox" id={this.props.id} checked={this.props.complete} onClick={this.toggleComplete}></input>
+         <li>{this.props.todoData.title}
+            <input type="checkbox" id={this.props.id} checked={this.props.todoData.complete} onClick={this.toggleComplete}></input>
             <label htmlFor={this.props.id} id={this.props.key}></label>
             <button onClick={this.tellParentToRemoveTodo}><i className="fa fa-trash"></i></button>
          </li>
